@@ -1,7 +1,8 @@
 export default function Home() {
   return (
-    <main className="flex justify-center items-center min-h-screen text-center bg-blue-600">
-      <div className="bg-white p-10 mt-10 md:mt-0 rounded-lg shadow-lg max-w-md w-full">
+    <main className="relative flex justify-center items-center min-h-screen text-center bg-[url('/court.jpg')] bg-cover bg-center">
+      <div className="bg-white/70 backdrop-blur-sm p-8 rounded-lg shadow-md text-center border border-gray-300">
+
         <h1 className="text-2xl font-bold text-gray-800 mb-4">Welcome to Advocate Registration</h1>
         <p className="mb-6 text-black">Register to participate in bar council events</p>
         <a href="/register">
@@ -13,3 +14,5 @@ export default function Home() {
     </main>
   );
 }
+
+

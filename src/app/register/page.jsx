@@ -3,25 +3,27 @@
 import { useState, useEffect } from 'react';
 
 export default function RegisterPage() {
-  const [step, setStep] = useState(1);
-  const [isHydrated, setIsHydrated] = useState(false);
+  const [step, setStep] = useState(1); // Step control
+  const [isHydrated, setIsHydrated] = useState(false); // Prevent SSR mismatch error
 
   useEffect(() => {
-    setIsHydrated(true);
+    setIsHydrated(true); // Ensures hydration on client
   }, []);
 
-  if (!isHydrated) return null;
+  if (!isHydrated) return null; // Avoid rendering before hydration
 
   return (
-    <main className="min-h-screen bg-[#4070f4] flex items-center justify-center p-4 text-black">
-      <div className="bg-white w-full max-w-4xl rounded-lg shadow-lg p-8">
+    <main className="min-h-screen flex items-center justify-center p-4 text-black">
+      <div className="form-container w-full max-w-6xl mx-auto p-6">
         <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">
           Lawyer Registration
         </h1>
 
-        <form onSubmit={(e) => e.preventDefault()} className="space-y-6 relative min-h-[600px]">
-          {/* Step Container */}
-          <div className="absolute inset-0 transition-opacity duration-300" style={{ opacity: step === 1 ? 1 : 0, zIndex: step === 1 ? 10 : 0, pointerEvents: step === 1 ? 'auto' : 'none' }}>
+        {/* FORM START */}
+        <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
+          
+          {/* STEP 1 */}
+          <div className={step === 1 ? 'block' : 'hidden'}>
             <Section title="Personal Information">
               <InputGrid>
                 <Input label="Full Name (Surname First)" type="text" placeholder="e.g., Sharma Rajeev" />
@@ -29,6 +31,28 @@ export default function RegisterPage() {
                 <Input label="Email" type="email" />
                 <Input label="Mobile Number" type="text" pattern="[0-9]{10}" />
                 <Select label="Gender" options={['Male', 'Female', 'Other']} />
+              </InputGrid>
+            </Section>
+
+            <Section title="Identification Details">
+              <InputGrid>
+                <Input
+                  label="Aadhaar Card Number"
+                  type="text"
+                  placeholder="e.g., 123456789012"
+                  pattern="\d{12}"
+                  maxLength={12}
+                  required
+                />
+                <Input
+                  label="PAN Card Number"
+                  type="text"
+                  placeholder="e.g., ABCDE1234F"
+                  pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}"
+                  maxLength={10}
+                  style={{ textTransform: 'uppercase' }}
+                  required
+                />
               </InputGrid>
             </Section>
 
@@ -51,8 +75,8 @@ export default function RegisterPage() {
             </Section>
           </div>
 
-          {/* Step 2 */}
-          <div className="absolute inset-0 transition-opacity duration-300" style={{ opacity: step === 2 ? 1 : 0, zIndex: step === 2 ? 10 : 0, pointerEvents: step === 2 ? 'auto' : 'none' }}>
+          {/* STEP 2 */}
+          <div className={step === 2 ? 'block' : 'hidden'}>
             <Section title="Bar Association Details">
               <InputGrid>
                 <Input label="Name of Bar Association" type="text" />
@@ -86,6 +110,7 @@ export default function RegisterPage() {
               </div>
             </Section>
           </div>
+
         </form>
       </div>
     </main>
@@ -102,10 +127,10 @@ function Section({ title, children }) {
 }
 
 function InputGrid({ children }) {
-  return <div className="grid grid-cols-1 md:grid-cols-2 gap-4">{children}</div>;
+  return <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 w-full">{children}</div>;
 }
 
-function Input({ label, type, placeholder = '', pattern = '' }) {
+function Input({ label, type, placeholder = '', pattern = '', maxLength, style = {} }) {
   return (
     <div className="flex flex-col">
       <label className="text-sm font-medium mb-1">{label}</label>
@@ -113,8 +138,10 @@ function Input({ label, type, placeholder = '', pattern = '' }) {
         type={type}
         placeholder={placeholder}
         pattern={pattern}
+        maxLength={maxLength}
         required
-        className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#4070f4]"
+        style={style}
+        className="w-full border border-black rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#4070f4]"
       />
     </div>
   );
@@ -127,7 +154,8 @@ function Select({ label, options }) {
       <select
         required
         defaultValue=""
-        className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#4070f4]"
+        className="border border-black rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#4070f4]"
+
       >
         <option value="" disabled>Select</option>
         {options.map((opt, i) => (
@@ -137,3 +165,4 @@ function Select({ label, options }) {
     </div>
   );
 }
+
