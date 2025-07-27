@@ -14,53 +14,77 @@ export default function RegisterPage() {
 
   if (!isHydrated) return null;
 
- const handleInputChange = (e) => {
-  const { name, value } = e.target;
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    let formattedValue = value.trim();
 
-  let formattedValue = value.trim();
+    if (name === 'pan') {
+      formattedValue = formattedValue.toUpperCase();
+    }
 
-  // Auto-format specific fields
-  if (name === 'pan') {
-    formattedValue = formattedValue.toUpperCase();
-  }
+    if (name === 'aadhaar' || name === 'mobile') {
+      formattedValue = formattedValue.replace(/\D/g, '');
+    }
 
-  if (name === 'aadhaar' || name === 'mobile') {
-    // Keep only digits
-    formattedValue = formattedValue.replace(/\D/g, '');
-  }
+    if (name === 'membership') {
+      formattedValue = formattedValue.replace(/\D/g, '');
+    }
 
-  if (name === 'membership') {
-    // Allow only numbers
-    formattedValue = formattedValue.replace(/\D/g, '');
-  }
-
-  setFormData(prev => ({
-    ...prev,
-    [name]: formattedValue
-  }));
-};
-
+    setFormData(prev => ({
+      ...prev,
+      [name]: formattedValue
+    }));
+  };
 
   const validateForm = () => {
     const requiredFields = [
-      'fullName', 'dob', 'email','password', 'mobile', 'gender',
-      'aadhaar', 'pan', 'enrollNo', 'enrollDate', 'barCouncil',
-      'barName', 'district', 'taluka', 'membership',
+      'fullName', 'email', 'password', 'mobile', 'gender',
+      'aadhaar', 'pan', 'enrollNo', 'barCouncil',
+      'district', 'taluka',
       'nominationType', 'proposerId', 'seconderId'
     ];
     return requiredFields.every(field => formData[field]?.trim());
   };
 
   const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!validateForm()) {
-      setShowPopup('Please fill all fields');
-      return;
-    }
+  e.preventDefault();
 
-    setShowPopup('Registration done ✓');
-    console.log('Submitted Form Data:', formData); // This can later be sent to backend
+  // Re-check Step 1 required fields
+  const requiredFields = [
+    'fullName', 'email', 'password', 'mobile', 'gender',
+    'aadhaar', 'pan', 'enrollNo', 'barCouncil',
+    'district', 'taluka', 'nominationType', 'proposerId', 'seconderId'
+  ];
+
+  const allFilled = requiredFields.every(field => formData[field]?.trim());
+
+  const validations = {
+    aadhaar: /^\d{12}$/,
+    pan: /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/,
+    enrollNo: /^[A-Z]{3,5}\/\d{4}\/\d{4}$/,
+    barCouncil: /^[A-Za-z\s]{3,100}$/,
+    email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+    mobile: /^\d{10}$/,
+    password: /^.{6,}$/, // more than 6
+    district: /^[A-Za-z\s]{2,50}$/,
+    taluka: /^[A-Za-z\s]{2,50}$/,
+    proposerId: /^[A-Z]{3,5}\/\d{4}\/\d{4}$/,
+    seconderId: /^[A-Z]{3,5}\/\d{4}\/\d{4}$/
   };
+
+  const invalidField = Object.entries(validations).find(
+    ([field, regex]) => !regex.test(formData[field] || '')
+  );
+
+  if (!allFilled || invalidField) {
+    setShowPopup('Please fill all fields correctly in Step 2');
+    return;
+  }
+
+  setShowPopup('Registration done ✓');
+  console.log('Submitted Form Data:', formData);
+};
+
 
   return (
     <main className="min-h-screen flex items-center justify-center p-4 text-black">
@@ -71,9 +95,6 @@ export default function RegisterPage() {
           </h1>
         </div>
 
-
-
-
         <form onSubmit={handleSubmit} className="space-y-6">
 
           {step === 1 && (
@@ -81,7 +102,6 @@ export default function RegisterPage() {
               <Section title="Personal Information">
                 <InputGrid>
                   <Input name="fullName" label="Full Name (Surname First)" placeholder="e.g., Sharma Rajeev" value={formData.fullName} onChange={handleInputChange} />
-                  <Input name="dob" label="Date of Birth" type="date" value={formData.dob} onChange={handleInputChange} />
                   <Input name="email" label="Email" type="email" value={formData.email} onChange={handleInputChange} />
                   <Input
                     name="password"
@@ -93,8 +113,7 @@ export default function RegisterPage() {
                     value={formData.password}
                     onChange={handleInputChange}
                   />
-
-                  <Input name="mobile" label="Mobile Number" pattern="[0-9]{10}" value={formData.mobile} onChange={handleInputChange} />
+                  <Input name="mobile" label="Mobile Number" pattern="^\d{10,}$" value={formData.mobile} onChange={handleInputChange} />
                   <Select name="gender" label="Gender" value={formData.gender} onChange={handleInputChange} options={['Male', 'Female', 'Other']} />
                 </InputGrid>
               </Section>
@@ -108,33 +127,44 @@ export default function RegisterPage() {
 
               <Section title="Enrollment Details">
                 <InputGrid>
-                  <Input name="enrollNo" label="Enrollment Number" placeholder="MAH/0000/0000"  pattern="^[A-Z]{3,5}/\d{4}/\d{4}$" value={formData.enrollNo} onChange={handleInputChange} />
-                  <Input name="enrollDate" label="Enrollment Date" type="date" value={formData.enrollDate} onChange={handleInputChange} />
-                  <Input name="barCouncil" label="Bar Council Name" placeholder="e.g., Maharashtra Bar Council"  pattern="^[A-Za-z\s]{3,100}$" value={formData.barCouncil} onChange={handleInputChange} />
+                  <Input name="enrollNo" label="Enrollment Number" placeholder="MAH/0000/0000" pattern="^[A-Z]{3,5}/\d{4}/\d{4}$" value={formData.enrollNo} onChange={handleInputChange} />
+                  <Input name="barCouncil" label="Bar Council Name" placeholder="e.g., Maharashtra Bar Council" pattern="^[A-Za-z\s]{3,100}$" value={formData.barCouncil} onChange={handleInputChange} />
                 </InputGrid>
 
                 <div className="flex justify-end mt-6">
                   <button
                     type="button"
                     onClick={() => {
-                      const step1Fields = ['fullName', 'dob', 'email','password', 'mobile', 'gender', 'aadhaar', 'pan', 'enrollNo', 'enrollDate', 'barCouncil'];
+                      const step1Fields = ['fullName', 'email', 'password', 'mobile', 'gender', 'aadhaar', 'pan', 'enrollNo', 'barCouncil'];
                       const allFilled = step1Fields.every(field => formData[field]?.trim());
-                      const aadhaarValid = /^\d{12}$/.test(formData.aadhaar || '');
-                      const panValid = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(formData.pan || '');
 
-                      if (!allFilled || !aadhaarValid || !panValid) {
+                      const validations = {
+                        aadhaar: /^\d{12}$/,
+                        pan: /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/,
+                        enrollNo: /^[A-Z]{3,5}\/\d{4}\/\d{4}$/,
+                        barCouncil: /^[A-Za-z\s]{3,100}$/,
+                        email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                        mobile: /^\d{10}$/,
+                        password: /^.{6,}$/  // 7 or more characters (since you want > 6)
+                      };
+
+                      const invalidField = Object.entries(validations).find(
+                        ([field, regex]) => !regex.test(formData[field] || '')
+                      );
+
+                      if (!allFilled || invalidField) {
                         setShowPopup('Please fill all fields correctly in Step 1');
                         return;
                       }
 
                       setStep(2);
                     }}
+
                     className="bg-[#4070f4] hover:bg-[#265df2] text-white px-6 py-2 rounded"
                   >
                     Next
                   </button>
                 </div>
-
               </Section>
             </>
           )}
@@ -143,10 +173,8 @@ export default function RegisterPage() {
             <>
               <Section title="Bar Association Details">
                 <InputGrid>
-                  <Input name="barName" label="Name of Bar Association" placeholder="e.g., Maharashtra and Goa Bar Association" pattern="^[A-Za-z0-9\s.,()\-]{3,100}$" value={formData.barName} onChange={handleInputChange} />
                   <Input name="district" label="District" pattern="^[A-Za-z\s]{2,50}$" value={formData.district} onChange={handleInputChange} />
                   <Input name="taluka" label="Taluka" pattern="^[A-Za-z\s]{2,50}$" value={formData.taluka} onChange={handleInputChange} />
-                  <Input name="membership" label="Membership Duration (in years)" type="number" pattern="^[0-9]{1,2}$" value={formData.membership} onChange={handleInputChange} />
                 </InputGrid>
               </Section>
 
@@ -166,8 +194,6 @@ export default function RegisterPage() {
           )}
 
         </form>
-
-
       </div>
 
       {showPopup && (
@@ -183,9 +209,7 @@ export default function RegisterPage() {
           </div>
         </div>
       )}
-
     </main>
-
   );
 }
 
