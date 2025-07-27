@@ -14,14 +14,36 @@ export default function RegisterPage() {
 
   if (!isHydrated) return null;
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
+ const handleInputChange = (e) => {
+  const { name, value } = e.target;
+
+  let formattedValue = value.trim();
+
+  // Auto-format specific fields
+  if (name === 'pan') {
+    formattedValue = formattedValue.toUpperCase();
+  }
+
+  if (name === 'aadhaar' || name === 'mobile') {
+    // Keep only digits
+    formattedValue = formattedValue.replace(/\D/g, '');
+  }
+
+  if (name === 'membership') {
+    // Allow only numbers
+    formattedValue = formattedValue.replace(/\D/g, '');
+  }
+
+  setFormData(prev => ({
+    ...prev,
+    [name]: formattedValue
+  }));
+};
+
 
   const validateForm = () => {
     const requiredFields = [
-      'fullName', 'dob', 'email', 'mobile', 'gender',
+      'fullName', 'dob', 'email','password', 'mobile', 'gender',
       'aadhaar', 'pan', 'enrollNo', 'enrollDate', 'barCouncil',
       'barName', 'district', 'taluka', 'membership',
       'nominationType', 'proposerId', 'seconderId'
@@ -61,6 +83,17 @@ export default function RegisterPage() {
                   <Input name="fullName" label="Full Name (Surname First)" placeholder="e.g., Sharma Rajeev" value={formData.fullName} onChange={handleInputChange} />
                   <Input name="dob" label="Date of Birth" type="date" value={formData.dob} onChange={handleInputChange} />
                   <Input name="email" label="Email" type="email" value={formData.email} onChange={handleInputChange} />
+                  <Input
+                    name="password"
+                    label="Create Password"
+                    type="password"
+                    pattern=".{6,}"
+                    placeholder="Minimum 6 characters"
+                    minLength={6}
+                    value={formData.password}
+                    onChange={handleInputChange}
+                  />
+
                   <Input name="mobile" label="Mobile Number" pattern="[0-9]{10}" value={formData.mobile} onChange={handleInputChange} />
                   <Select name="gender" label="Gender" value={formData.gender} onChange={handleInputChange} options={['Male', 'Female', 'Other']} />
                 </InputGrid>
@@ -75,16 +108,16 @@ export default function RegisterPage() {
 
               <Section title="Enrollment Details">
                 <InputGrid>
-                  <Input name="enrollNo" label="Enrollment Number" placeholder="MAH/0000/0000" value={formData.enrollNo} onChange={handleInputChange} />
+                  <Input name="enrollNo" label="Enrollment Number" placeholder="MAH/0000/0000"  pattern="^[A-Z]{3,5}/\d{4}/\d{4}$" value={formData.enrollNo} onChange={handleInputChange} />
                   <Input name="enrollDate" label="Enrollment Date" type="date" value={formData.enrollDate} onChange={handleInputChange} />
-                  <Input name="barCouncil" label="Bar Council Name" placeholder="e.g., Maharashtra Bar Council" value={formData.barCouncil} onChange={handleInputChange} />
+                  <Input name="barCouncil" label="Bar Council Name" placeholder="e.g., Maharashtra Bar Council"  pattern="^[A-Za-z\s]{3,100}$" value={formData.barCouncil} onChange={handleInputChange} />
                 </InputGrid>
 
                 <div className="flex justify-end mt-6">
                   <button
                     type="button"
                     onClick={() => {
-                      const step1Fields = ['fullName', 'dob', 'email', 'mobile', 'gender', 'aadhaar', 'pan', 'enrollNo', 'enrollDate', 'barCouncil'];
+                      const step1Fields = ['fullName', 'dob', 'email','password', 'mobile', 'gender', 'aadhaar', 'pan', 'enrollNo', 'enrollDate', 'barCouncil'];
                       const allFilled = step1Fields.every(field => formData[field]?.trim());
                       const aadhaarValid = /^\d{12}$/.test(formData.aadhaar || '');
                       const panValid = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(formData.pan || '');
