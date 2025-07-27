@@ -1,119 +1,158 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function RegisterPage() {
-  const [step, setStep] = useState(1); // Step control
-  const [isHydrated, setIsHydrated] = useState(false); // Prevent SSR mismatch error
+  const [step, setStep] = useState(1);
+  const [isHydrated, setIsHydrated] = useState(false);
+  const [formData, setFormData] = useState({});
+  const [showPopup, setShowPopup] = useState('');
 
   useEffect(() => {
-    setIsHydrated(true); // Ensures hydration on client
+    setIsHydrated(true);
   }, []);
 
-  if (!isHydrated) return null; // Avoid rendering before hydration
+  if (!isHydrated) return null;
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const validateForm = () => {
+    const requiredFields = [
+      'fullName', 'dob', 'email', 'mobile', 'gender',
+      'aadhaar', 'pan', 'enrollNo', 'enrollDate', 'barCouncil',
+      'barName', 'district', 'taluka', 'membership',
+      'nominationType', 'proposerId', 'seconderId'
+    ];
+    return requiredFields.every(field => formData[field]?.trim());
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!validateForm()) {
+      setShowPopup('Please fill all fields');
+      return;
+    }
+
+    setShowPopup('Registration done ✓');
+    console.log('Submitted Form Data:', formData); // This can later be sent to backend
+  };
 
   return (
     <main className="min-h-screen flex items-center justify-center p-4 text-black">
       <div className="form-container w-full max-w-6xl mx-auto p-6">
-        <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">
-          Lawyer Registration
-        </h1>
+        <div className="text-center">
+          <h1 className="text-3xl font-semibold text-gray-700 inline-block mb-3 relative pb-2">
+            Lawyer Registration
+          </h1>
+        </div>
 
-        {/* FORM START */}
-        <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
-          
-          {/* STEP 1 */}
-          <div className={step === 1 ? 'block' : 'hidden'}>
-            <Section title="Personal Information">
-              <InputGrid>
-                <Input label="Full Name (Surname First)" type="text" placeholder="e.g., Sharma Rajeev" />
-                <Input label="Date of Birth" type="date" />
-                <Input label="Email" type="email" />
-                <Input label="Mobile Number" type="text" pattern="[0-9]{10}" />
-                <Select label="Gender" options={['Male', 'Female', 'Other']} />
-              </InputGrid>
-            </Section>
 
-            <Section title="Identification Details">
-              <InputGrid>
-                <Input
-                  label="Aadhaar Card Number"
-                  type="text"
-                  placeholder="e.g., 123456789012"
-                  pattern="\d{12}"
-                  maxLength={12}
-                  required
-                />
-                <Input
-                  label="PAN Card Number"
-                  type="text"
-                  placeholder="e.g., ABCDE1234F"
-                  pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}"
-                  maxLength={10}
-                  style={{ textTransform: 'uppercase' }}
-                  required
-                />
-              </InputGrid>
-            </Section>
 
-            <Section title="Enrollment Details">
-              <InputGrid>
-                <Input label="Enrollment Number" type="text" placeholder="MAH/0000/0000" />
-                <Input label="Enrollment Date" type="date" />
-                <Input label="Bar Council Name" type="text" placeholder="e.g., Maharashtra Bar Council" />
-              </InputGrid>
 
-              <div className="flex justify-end mt-6">
-                <button
-                  type="button"
-                  onClick={() => setStep(2)}
-                  className="bg-[#4070f4] hover:bg-[#265df2] text-white px-6 py-2 rounded"
-                >
-                  Next
-                </button>
-              </div>
-            </Section>
-          </div>
+        <form onSubmit={handleSubmit} className="space-y-6">
 
-          {/* STEP 2 */}
-          <div className={step === 2 ? 'block' : 'hidden'}>
-            <Section title="Bar Association Details">
-              <InputGrid>
-                <Input label="Name of Bar Association" type="text" />
-                <Input label="District" type="text" />
-                <Input label="Taluka" type="text" />
-                <Input label="Membership Duration (in years)" type="number" />
-              </InputGrid>
-            </Section>
+          {step === 1 && (
+            <>
+              <Section title="Personal Information">
+                <InputGrid>
+                  <Input name="fullName" label="Full Name (Surname First)" placeholder="e.g., Sharma Rajeev" value={formData.fullName} onChange={handleInputChange} />
+                  <Input name="dob" label="Date of Birth" type="date" value={formData.dob} onChange={handleInputChange} />
+                  <Input name="email" label="Email" type="email" value={formData.email} onChange={handleInputChange} />
+                  <Input name="mobile" label="Mobile Number" pattern="[0-9]{10}" value={formData.mobile} onChange={handleInputChange} />
+                  <Select name="gender" label="Gender" value={formData.gender} onChange={handleInputChange} options={['Male', 'Female', 'Other']} />
+                </InputGrid>
+              </Section>
 
-            <Section title="Delegate Nomination">
-              <InputGrid>
-                <Select label="Nominated or Elected?" options={['Nominated', 'Elected']} />
-                <Input label="Proposer Bar Council ID" type="text" />
-                <Input label="Seconder Bar Council ID" type="text" />
-              </InputGrid>
+              <Section title="Identification Details">
+                <InputGrid>
+                  <Input name="aadhaar" label="Aadhaar Card Number" placeholder="e.g., 123456789012" pattern="\d{12}" maxLength={12} value={formData.aadhaar} onChange={handleInputChange} />
+                  <Input name="pan" label="PAN Card Number" placeholder="e.g., ABCDE1234F" pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}" maxLength={10} style={{ textTransform: 'uppercase' }} value={formData.pan} onChange={handleInputChange} />
+                </InputGrid>
+              </Section>
 
-              <div className="flex justify-between mt-6">
-                <button
-                  type="button"
-                  onClick={() => setStep(1)}
-                  className="bg-[#4070f4] hover:bg-[#265df2] text-white px-6 py-2 rounded"
-                >
-                  Back
-                </button>
-                <button
-                  type="submit"
-                  className="bg-[#4070f4] hover:bg-[#265df2] text-white px-6 py-2 rounded"
-                >
-                  Submit
-                </button>
-              </div>
-            </Section>
-          </div>
+              <Section title="Enrollment Details">
+                <InputGrid>
+                  <Input name="enrollNo" label="Enrollment Number" placeholder="MAH/0000/0000" value={formData.enrollNo} onChange={handleInputChange} />
+                  <Input name="enrollDate" label="Enrollment Date" type="date" value={formData.enrollDate} onChange={handleInputChange} />
+                  <Input name="barCouncil" label="Bar Council Name" placeholder="e.g., Maharashtra Bar Council" value={formData.barCouncil} onChange={handleInputChange} />
+                </InputGrid>
+
+                <div className="flex justify-end mt-6">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const step1Fields = ['fullName', 'dob', 'email', 'mobile', 'gender', 'aadhaar', 'pan', 'enrollNo', 'enrollDate', 'barCouncil'];
+                      const allFilled = step1Fields.every(field => formData[field]?.trim());
+                      const aadhaarValid = /^\d{12}$/.test(formData.aadhaar || '');
+                      const panValid = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(formData.pan || '');
+
+                      if (!allFilled || !aadhaarValid || !panValid) {
+                        setShowPopup('Please fill all fields correctly in Step 1');
+                        return;
+                      }
+
+                      setStep(2);
+                    }}
+                    className="bg-[#4070f4] hover:bg-[#265df2] text-white px-6 py-2 rounded"
+                  >
+                    Next
+                  </button>
+                </div>
+
+              </Section>
+            </>
+          )}
+
+          {step === 2 && (
+            <>
+              <Section title="Bar Association Details">
+                <InputGrid>
+                  <Input name="barName" label="Name of Bar Association" placeholder="e.g., Maharashtra and Goa Bar Association" pattern="^[A-Za-z0-9\s.,()\-]{3,100}$" value={formData.barName} onChange={handleInputChange} />
+                  <Input name="district" label="District" pattern="^[A-Za-z\s]{2,50}$" value={formData.district} onChange={handleInputChange} />
+                  <Input name="taluka" label="Taluka" pattern="^[A-Za-z\s]{2,50}$" value={formData.taluka} onChange={handleInputChange} />
+                  <Input name="membership" label="Membership Duration (in years)" type="number" pattern="^[0-9]{1,2}$" value={formData.membership} onChange={handleInputChange} />
+                </InputGrid>
+              </Section>
+
+              <Section title="Delegate Nomination">
+                <InputGrid>
+                  <Select name="nominationType" label="Nominated or Elected?" value={formData.nominationType} onChange={handleInputChange} options={['Nominated', 'Elected']} />
+                  <Input name="proposerId" label="Proposer Bar Council ID" placeholder="e.g., MAH/1234/2024" pattern="^[A-Z]{2,5}/\d{4,5}/\d{4}$" value={formData.proposerId} onChange={handleInputChange} />
+                  <Input name="seconderId" label="Seconder Bar Council ID" placeholder="e.g., DEL/5678/2023" pattern="^[A-Z]{2,5}/\d{4,5}/\d{4}$" value={formData.seconderId} onChange={handleInputChange} />
+                </InputGrid>
+
+                <div className="flex justify-between mt-6">
+                  <button type="button" onClick={() => setStep(1)} className="bg-[#4070f4] hover:bg-[#265df2] text-white px-6 py-2 rounded">Back</button>
+                  <button type="submit" className="bg-[#4070f4] hover:bg-[#265df2] text-white px-6 py-2 rounded">Submit</button>
+                </div>
+              </Section>
+            </>
+          )}
 
         </form>
+
+
       </div>
+
+      {showPopup && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-opacity-40">
+          <div className="bg-white p-6 rounded shadow-lg text-center max-w-sm w-full">
+            <p className="text-lg text-gray-800">{showPopup}</p>
+            <button
+              onClick={() => setShowPopup('')}
+              className="mt-4 px-4 py-2 bg-[#4070f4] hover:bg-[#265df2] text-white rounded"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
     </main>
+
   );
 }
 
@@ -130,15 +169,18 @@ function InputGrid({ children }) {
   return <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 w-full">{children}</div>;
 }
 
-function Input({ label, type, placeholder = '', pattern = '', maxLength, style = {} }) {
+function Input({ name, label, type = 'text', placeholder = '', pattern = '', maxLength, style = {}, value, onChange }) {
   return (
     <div className="flex flex-col">
       <label className="text-sm font-medium mb-1">{label}</label>
       <input
+        name={name}
         type={type}
         placeholder={placeholder}
         pattern={pattern}
         maxLength={maxLength}
+        value={value || ''}
+        onChange={onChange}
         required
         style={style}
         className="w-full border border-black rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#4070f4]"
@@ -147,22 +189,22 @@ function Input({ label, type, placeholder = '', pattern = '', maxLength, style =
   );
 }
 
-function Select({ label, options }) {
+function Select({ name, label, options, value, onChange }) {
   return (
     <div className="flex flex-col">
       <label className="text-sm font-medium mb-1">{label}</label>
       <select
+        name={name}
         required
-        defaultValue=""
+        value={value || ''}
+        onChange={onChange}
         className="border border-black rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#4070f4]"
-
       >
         <option value="" disabled>Select</option>
         {options.map((opt, i) => (
-          <option key={i}>{opt}</option>
+          <option key={i} value={opt}>{opt}</option>
         ))}
       </select>
     </div>
   );
 }
-
