@@ -61,15 +61,15 @@ export default function RegisterPage() {
   const validations = {
     aadhaar: /^\d{12}$/,
     pan: /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/,
-    enrollNo: /^[A-Z]{3,5}\/\d{4}\/\d{4}$/,
+    enrollNo: /^[A-Z]{1,5}\/\d{4}\/\d{4}$/,
     barCouncil: /^[A-Za-z\s]{3,100}$/,
     email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
     mobile: /^\d{10}$/,
     password: /^.{6,}$/, // more than 6
     district: /^[A-Za-z\s]{2,50}$/,
     taluka: /^[A-Za-z\s]{2,50}$/,
-    proposerId: /^[A-Z]{3,5}\/\d{4}\/\d{4}$/,
-    seconderId: /^[A-Z]{3,5}\/\d{4}\/\d{4}$/
+    proposerId: /^[A-Z]{1,5}\/\d{4}\/\d{4}$/,
+    seconderId: /^[A-Z]{1,5}\/\d{4}\/\d{4}$/
   };
 
   const invalidField = Object.entries(validations).find(
@@ -141,7 +141,7 @@ export default function RegisterPage() {
                       const validations = {
                         aadhaar: /^\d{12}$/,
                         pan: /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/,
-                        enrollNo: /^[A-Z]{3,5}\/\d{4}\/\d{4}$/,
+                        enrollNo: /^[A-Z]{1,5}\/\d{4}\/\d{4}$/,
                         barCouncil: /^[A-Za-z\s]{3,100}$/,
                         email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
                         mobile: /^\d{10}$/,
@@ -181,8 +181,8 @@ export default function RegisterPage() {
               <Section title="Delegate Nomination">
                 <InputGrid>
                   <Select name="nominationType" label="Nominated or Elected?" value={formData.nominationType} onChange={handleInputChange} options={['Nominated', 'Elected']} />
-                  <Input name="proposerId" label="Proposer Bar Council ID" placeholder="e.g., MAH/1234/2024" pattern="^[A-Z]{2,5}/\d{4,5}/\d{4}$" value={formData.proposerId} onChange={handleInputChange} />
-                  <Input name="seconderId" label="Seconder Bar Council ID" placeholder="e.g., DEL/5678/2023" pattern="^[A-Z]{2,5}/\d{4,5}/\d{4}$" value={formData.seconderId} onChange={handleInputChange} />
+                  <Input name="proposerId" label="Proposer Bar Council ID" placeholder="e.g., MAH/1234/2024" pattern="^[A-Z]{1,5}/\d{4,5}/\d{4}$" value={formData.proposerId} onChange={handleInputChange} />
+                  <Input name="seconderId" label="Seconder Bar Council ID" placeholder="e.g., DEL/5678/2023" pattern="^[A-Z]{1,5}/\d{4,5}/\d{4}$" value={formData.seconderId} onChange={handleInputChange} />
                 </InputGrid>
 
                 <div className="flex justify-between mt-6">
