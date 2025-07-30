@@ -46,10 +46,9 @@ export default function RegisterPage() {
     return requiredFields.every(field => formData[field]?.trim());
   };
 
-  const handleSubmit = (e) => {
+ const handleSubmit = async (e) => {
   e.preventDefault();
 
-  // Re-check Step 1 required fields
   const requiredFields = [
     'fullName', 'email', 'password', 'mobile', 'gender',
     'aadhaar', 'pan', 'enrollNo', 'barCouncil',
@@ -65,7 +64,7 @@ export default function RegisterPage() {
     barCouncil: /^[A-Za-z\s]{3,100}$/,
     email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
     mobile: /^\d{10}$/,
-    password: /^.{6,}$/, // more than 6
+    password: /^.{6,}$/, // min 6 chars
     district: /^[A-Za-z\s]{2,50}$/,
     taluka: /^[A-Za-z\s]{2,50}$/,
     proposerId: /^[A-Z]{1,5}\/\d{4}\/\d{4}$/,
@@ -81,9 +80,28 @@ export default function RegisterPage() {
     return;
   }
 
-  setShowPopup('Registration done ✓');
-  console.log('Submitted Form Data:', formData);
+  try {
+    const response = await fetch('http://localhost:8080/api/lawyers', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(formData)
+    });
+
+    if (response.ok) {
+      setShowPopup('Registration done ✓');
+      console.log('Submitted to backend:', formData);
+    } else {
+      setShowPopup('Failed to register. Backend error.');
+      console.error('Server error:', response.statusText);
+    }
+  } catch (error) {
+    console.error('Network error:', error.message);
+    setShowPopup('Backend not reachable (Check connection)');
+  }
 };
+
 
 
   return (
