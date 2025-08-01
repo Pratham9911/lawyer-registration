@@ -19,7 +19,10 @@ export default function Navbar({ toggleSidebar }) {
       </h2>
 
       {/* Dummy profile circle */}
-      <div className="w-8 h-8 rounded-full bg-gray-300" />
+      <div className="w-8 h-8 rounded-full bg-gray-300">
+           <h2 className='text-black font-extrabold pl-2.5 pt-1'>P</h2>
+      </div>
+      
     </header>
   );
 }
