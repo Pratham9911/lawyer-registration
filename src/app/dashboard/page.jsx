@@ -25,10 +25,10 @@ export default function Dashboard() {
             <div className="flex-1 flex flex-col overflow-hidden">
                 <Navbar toggleSidebar={toggleSidebar} />
 
-                <main className="flex-1 overflow-y-auto p-6">
-                    {activeTab === 'home' && <Home />}
-                    {activeTab === 'profile' && <Profile />}
-                    {activeTab === 'cases' && <Cases />}
+                <main className="flex-1 overflow-y-auto">
+                    {activeTab === "home" && <Home />}
+                    {activeTab === "profile" && <Profile />}
+                    {activeTab === "cases" && <Cases />}
                 </main>
             </div>
         </div>
