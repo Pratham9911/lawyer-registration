@@ -21,7 +21,7 @@ const lawyerData = {
 
 export default function LawyerProfilePage() {
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-gradient-to-br from-blue-100 via-blue-200 to-blue-400
+    <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-gradient-to-br
 ">
       <div className="max-w-4xl w-full p-10 border border-gray-200 rounded-xl shadow-lg bg-white">
         <h1 className="text-4xl font-bold text-center text-blue-800 mb-10">
